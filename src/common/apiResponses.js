@@ -4,7 +4,8 @@ export const messages = {
     BUCKET_UPDATED : "Bucket Updated Successfully",
     BALL_CREATED :'Ball Create Successfully',
     BALL_UPDATED : "Ball Updated Successfully",
-    BALL_STORED : "All balls stored successfully in buckets."
+    BALL_STORED : "All balls stored successfully in buckets.",
+    CREATE_BUCKET_FIRST : "First create a bucket!"
 
 
 }
