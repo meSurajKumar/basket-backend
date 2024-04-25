@@ -45,8 +45,7 @@ class BasketController{
                         ballCounts: 1
                     });
                 }
-            }
-    
+            }    
             // Now transformedBallData contains individual balls with count 1 each    
             // Iterate through each ball and place it in a bucket
             for (const ball of transformedBallData) {
@@ -54,8 +53,7 @@ class BasketController{
     
                 // Fetch the volume of the ball from the database
                 const ballData = await Ball.findOne({ ballColor: ball.ballName });
-                const ballVolume = ballData.ballVolume;
-    
+                const ballVolume = ballData.ballVolume;    
                 // Find a bucket with enough space to store the ball
                 const bucket = await Bucket.findOneAndUpdate(
                     { bucketVolumeLeft: { $gte: ballVolume }, "ballsData.ballName": ball.ballName },
@@ -83,11 +81,19 @@ class BasketController{
                 }
             }    
             // All balls stored successfully
-            return res.status(200).send({ message: "All balls stored successfully in buckets." });
+            return res.status(200).send({ message: messages.BALL_STORED});
         } catch (error) {
-            console.error("Error in addBalls method:", error);
             return res.status(500).send({ message: "An error occurred while placing balls in buckets." });
         }
+    }
+
+    /**
+     *@param{}
+     *@return json response 
+    */
+    getBucketData = async(req, res)=>{
+        const bucket = await Bucket.find()
+        return res.status(200).send({ message: "Buckets data : ", data:bucket});
     }
 
 }
