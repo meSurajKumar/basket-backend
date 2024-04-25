@@ -1,0 +1,20 @@
+Balls, Buckets and Output Must be stored in Database
+• Note:Every time a user requests the system to place balls in buckets by inputting
+a quantity of balls to be placed, the empty volume of the bucket will get reduced after the placement
+of the balls.
+• Everytime user adds new bucket or ball or update existing bucket or ball, all buckets will get
+emptied.
+Following things are to be kept in mind while designing a system:
+1) Every time the balls are placed in bucket, empty volume will be reduced by volume
+of the balls placed inside the bucket
+2) Partial placement must be made by the system, if all the balls are not possible to be placed inside
+the buckets because of the lack of empty volume, then the maximum possible volume of the balls must
+be placed.
+3) After any placement, empty volume must not be less than zero, if no bucket satisfies this criteria,
+no placement will be made and message will be shown.
+4) Minimum number of the buckets must be used for balls placement
+5) Wherever possible, in a single placement, system must utilize the single bucket to its maximum
+empty volume.
+6) Any ball of any color can go to any basket, all depending on the empty volume and other criteria
+mentioned above.
+7) Please comment wherever necessary and follow coding standards.

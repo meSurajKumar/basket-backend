@@ -9,6 +9,10 @@ const bucketSchema = new Schema({
     },
     bucketVolumeLeft : {
         type : Number
+    },
+    ballsData : {
+        type : Array,
+        default:[]
     }
 })
 
