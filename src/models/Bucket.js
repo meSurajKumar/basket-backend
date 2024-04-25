@@ -6,8 +6,11 @@ const bucketSchema = new Schema({
     },
     bucketVolume : {
         type : Number
+    },
+    bucketVolumeLeft : {
+        type : Number
     }
 })
 
-const Bucket = model('bucket' , bucketSchema)
+const Bucket = model('buckets' , bucketSchema)
 export default Bucket;
