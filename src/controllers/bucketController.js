@@ -47,9 +47,7 @@ class BasketController{
                 }
             }
     
-            // Now transformedBallData contains individual balls with count 1 each
-            console.log("Transformed Ball Data:", transformedBallData);
-    
+            // Now transformedBallData contains individual balls with count 1 each    
             // Iterate through each ball and place it in a bucket
             for (const ball of transformedBallData) {
                 let ballStored = false;
@@ -60,24 +58,30 @@ class BasketController{
     
                 // Find a bucket with enough space to store the ball
                 const bucket = await Bucket.findOneAndUpdate(
-                    { bucketVolumeLeft: { $gte: ballVolume } },
-                    { $push: { ballsData: { ballName: ball.ballName, ballCounts: 1 } }, $inc: { bucketVolumeLeft: -ballVolume } },
-                    { sort: { bucketVolumeLeft: 1 }, new: true }
-                );
-    
-                if (bucket) {
-                    ballStored = true;
-                    console.log(`Ball '${ball.ballName}' stored in bucket '${bucket.bucketName}'.`);
+                    { bucketVolumeLeft: { $gte: ballVolume }, "ballsData.ballName": ball.ballName },
+                    { $inc: { "ballsData.$.ballCounts": 1, bucketVolumeLeft: -ballVolume } },
+                    { new: true }
+                );    
+                if (!bucket) {
+                    // If the ball with the same name is not found in the bucket, add a new object
+                    const newBucket = await Bucket.findOneAndUpdate(
+                        { bucketVolumeLeft: { $gte: ballVolume } },
+                        { $push: { ballsData: { ballName: ball.ballName, ballCounts: 1 } }, $inc: { bucketVolumeLeft: -ballVolume } },
+                        { sort: { bucketVolumeLeft: 1 }, new: true }
+                    );    
+                    if (newBucket) {
+                        ballStored = true;
+                        console.log(`Ball '${ball.ballName}' stored in new bucket '${newBucket.bucketName}'.`);
+                    }
                 } else {
-                    console.log(`No bucket available to store ball '${ball.ballName}'.`);
-                }
-    
+                    ballStored = true;
+                    console.log(`Ball '${ball.ballName}' added to existing bucket '${bucket.bucketName}'.`);
+                }    
                 if (!ballStored) {
                     // Handle the case where the ball couldn't be stored in any bucket
                     return res.status(400).send({ message: `Ball '${ball.ballName}' couldn't be stored.` });
                 }
-            }
-    
+            }    
             // All balls stored successfully
             return res.status(200).send({ message: "All balls stored successfully in buckets." });
         } catch (error) {
