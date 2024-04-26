@@ -59,9 +59,10 @@ class BasketController{
         try {
             let transformedBallData = [];
             const ballsData = req.body.ballData;
-            const buckets = await Bucket.find()
-            if (buckets.length==0) return res.status(400).send({ message:messages.CREATE_BUCKET_FIRST });
-
+            const buckets = await Bucket.find();
+    
+            if (buckets.length == 0) return res.status(400).send({ message: messages.CREATE_BUCKET_FIRST });
+    
             // Transform ballData array to ensure each ball count is represented as a separate object
             for (const ball of ballsData) {
                 for (let i = 0; i < ball.ballCounts; i++) {
@@ -73,27 +74,32 @@ class BasketController{
             }    
             // Now transformedBallData contains individual balls with count 1 each    
             // Array to store the names of balls that couldn't be stored
-            let ballsNotStored = [];    
+            let ballsNotStored = [];
+            let totalVolumeNotStored = 0;
+    
             // Iterate through each ball and place it in a bucket
             for (const ball of transformedBallData) {
-                let ballStored = false;    
+                let ballStored = false;
+    
                 // Fetch the volume of the ball from the database
                 const ballData = await Ball.findOne({ ballColor: ball.ballName });
-                const ballVolume = ballData.ballVolume;    
+                const ballVolume = ballData.ballVolume;
+    
                 // Find a bucket with enough space to store the ball
                 const bucket = await Bucket.findOneAndUpdate(
                     { bucketVolumeLeft: { $gte: ballVolume }, "ballsData.ballName": ball.ballName },
                     { $inc: { "ballsData.$.ballCounts": 1, bucketVolumeLeft: -ballVolume } },
                     { new: true }
                 );
-                   
+    
                 if (!bucket) {
                     // If the ball with the same name is not found in the bucket, add it to the list
                     const newBucket = await Bucket.findOneAndUpdate(
                         { bucketVolumeLeft: { $gte: ballVolume } },
                         { $push: { ballsData: { ballName: ball.ballName, ballCounts: 1 } }, $inc: { bucketVolumeLeft: -ballVolume } },
                         { sort: { bucketVolumeLeft: 1 }, new: true }
-                    );    
+                    );
+    
                     if (newBucket) {
                         ballStored = true;
                         console.log(`Ball '${ball.ballName}' stored in new bucket '${newBucket.bucketName}'.`);
@@ -101,18 +107,24 @@ class BasketController{
                 } else {
                     ballStored = true;
                     console.log(`Ball '${ball.ballName}' added to existing bucket '${bucket.bucketName}'.`);
-                }    
+                }
+    
                 if (!ballStored) {
                     // Handle the case where the ball couldn't be stored in any bucket
-                    console.log(`Ball '${ball.ballName}' couldn't be stored.`);    
+                    console.log(`Ball '${ball.ballName}' couldn't be stored.`);
                     // If the ball couldn't be stored, add it to the ballsNotStored array
                     ballsNotStored.push(ball.ballName);
+                    totalVolumeNotStored += ballVolume;
                 }
             }
     
             if (ballsNotStored.length > 0) {
                 // Calculate the count of each type of ball that couldn't be stored
-                let message = "Some balls couldn't be stored in buckets return them to shop ";
+                let message = "Some balls couldn't be stored in buckets, return them to shop. ";
+    
+                // Get the minimum number of buckets required to store the balls that couldn't be placed
+                const minBucketsRequired = Math.ceil(totalVolumeNotStored / Math.max(...buckets.map(bucket => bucket.bucketVolume)));
+    
                 let ballCounts = {};
                 for (const ballName of ballsNotStored) {
                     if (!ballCounts[ballName]) {
@@ -120,11 +132,14 @@ class BasketController{
                     } else {
                         ballCounts[ballName]++;
                     }
-                }    
-                // Construct the message with ball counts
+                }
+    
+                // Construct the message with ball counts and the minimum number of buckets required
                 for (const [ballName, count] of Object.entries(ballCounts)) {
                     message += `${count} ${ballName} ball `;
                 }
+    
+                message += `Minimum ${minBucketsRequired} buckets required to store the remaining balls.`;
     
                 return res.status(400).send({ message });
             } else {
@@ -135,7 +150,8 @@ class BasketController{
             console.error("Error in addBalls method:", error);
             return res.status(500).send({ message: "An error occurred while placing balls in buckets." });
         }
-    }
+    };
+    
 
     /**
      *@param{}
@@ -145,6 +161,16 @@ class BasketController{
         const bucket = await Bucket.find()
         return res.status(200).send({ message: "Buckets data : ", data:bucket});
     }
+
+    /**
+     *@param{}
+     *@return json response 
+    */
+    getBucketSuggesion = async(req, res)=>{
+        const bucket = await Bucket.find()
+        return res.status(200).send({ message: "Buckets data : ", data:bucket});
+    }
+
 
 }
 
