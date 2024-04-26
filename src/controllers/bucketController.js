@@ -1,6 +1,7 @@
 import Bucket from "../models/Bucket.js";
 import Ball from "../models/Ball.js";
 import {messages} from '../common/apiResponses.js'
+import {emptyBucket} from '../common/commonFunctions.js'
 
 
 class BasketController{
@@ -11,21 +12,43 @@ class BasketController{
      * @param {bucketName , volume}
      * @return json response
     */
-    createBucket = async(req, res)=>{
-        const {bucketName , volume} = req.body
-        const bucketExist = await Bucket.findOne({bucketName : bucketName})
-        if(bucketExist) {
-            await Bucket.updateOne({bucketName:bucketName},{bucketName:bucketName , bucketVolume:volume})
-            return res.status(200).send({message: messages.BUCKET_UPDATED})
+    createBucket = async (req, res) => {
+        try {
+            const { bucketName, volume } = req.body;    
+            // Empty all existing buckets
+            const buckets = await Bucket.find();
+            const emptyPromises = buckets.map(bucket => emptyBucket(bucket._id));
+            await Promise.all(emptyPromises);
+    
+            let bucket;
+            let message;    
+            // Check if the bucket already exists
+            const existingBucket = await Bucket.findOne({ bucketName });    
+            if (existingBucket) {
+                // Update the existing bucket
+                bucket = await Bucket.findOneAndUpdate(
+                    { bucketName },
+                    { bucketVolume: volume },
+                    { new: true }
+                );
+                message = messages.BUCKET_UPDATED;
+            } else {
+                // Create a new bucket
+                bucket = new Bucket({
+                    bucketName,
+                    bucketVolume: volume,
+                    bucketVolumeLeft: volume,
+                    ballsData: []
+                });
+                await bucket.save();
+                message = messages.BUCKET_CREATED;
+            }    
+            return res.status(200).send({ message, data: bucket });
+        } catch (error) {
+            console.error("Error in createBucket method:", error);
+            return res.status(500).send({ message: "An error occurred while creating or updating the bucket." });
         }
-        const bucketData = new Bucket({
-            bucketName, 
-            bucketVolume:volume,
-            bucketVolumeLeft:volume
-        })        
-        const bucketSaved = await bucketData.save();
-        return res.status(200).send({message: messages.BUCKET_CREATED, data:bucketSaved})
-    }
+    };
 
     /**
      * Add balls to bucket
