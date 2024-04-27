@@ -1,0 +1,290 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Basket-Test",
+    "contact": {},
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api/v1",
+      "variables": {}
+    }
+  ],
+  "paths": {
+    "/bucket/create-bucket": {
+      "post": {
+        "tags": [
+          "Basket"
+        ],
+        "summary": "create-bucket",
+        "operationId": "create-bucket",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/create-bucket-request"
+                  },
+                  {
+                    "example": {
+                      "bucketName": "BucketC",
+                      "volume": 10
+                    }
+                  }
+                ]
+              },
+              "example": {
+                "bucketName": "BucketC",
+                "volume": 10
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/bucket/add-balls": {
+      "post": {
+        "tags": [
+          "Basket"
+        ],
+        "summary": "add-balls",
+        "operationId": "add-balls",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/add-balls-request"
+                  },
+                  {
+                    "example": {
+                      "ballData": [
+                        {
+                          "ballName": "Blue",
+                          "ballCounts": 1
+                        },
+                        {
+                          "ballName": "Green",
+                          "ballCounts": 2
+                        },
+                        {
+                          "ballName": "red",
+                          "ballCounts": 1
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "example": {
+                "ballData": [
+                  {
+                    "ballName": "Blue",
+                    "ballCounts": 1
+                  },
+                  {
+                    "ballName": "Green",
+                    "ballCounts": 2
+                  },
+                  {
+                    "ballName": "red",
+                    "ballCounts": 1
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/bucket": {
+      "get": {
+        "tags": [
+          "Basket"
+        ],
+        "summary": "get-bucket-data",
+        "operationId": "get-bucket-data",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/ball/create-ball": {
+      "post": {
+        "tags": [
+          "Balls"
+        ],
+        "summary": "create-ball",
+        "operationId": "create-ball",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/create-ball-request"
+                  },
+                  {
+                    "example": {
+                      "ballColor": "Pink",
+                      "ballVolume": 20
+                    }
+                  }
+                ]
+              },
+              "example": {
+                "ballColor": "Pink",
+                "ballVolume": 20
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "create-bucket-request": {
+        "title": "create-bucket-request",
+        "required": [
+          "bucketName",
+          "volume"
+        ],
+        "type": "object",
+        "properties": {
+          "bucketName": {
+            "type": "string"
+          },
+          "volume": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "example": {
+          "bucketName": "BucketC",
+          "volume": 10
+        }
+      },
+      "add-balls-request": {
+        "title": "add-balls-request",
+        "required": [
+          "ballData"
+        ],
+        "type": "object",
+        "properties": {
+          "ballData": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BallDatum"
+            },
+            "description": ""
+          }
+        },
+        "example": {
+          "ballData": [
+            {
+              "ballName": "Blue",
+              "ballCounts": 1
+            },
+            {
+              "ballName": "Green",
+              "ballCounts": 2
+            },
+            {
+              "ballName": "red",
+              "ballCounts": 1
+            }
+          ]
+        }
+      },
+      "BallDatum": {
+        "title": "BallDatum",
+        "required": [
+          "ballName",
+          "ballCounts"
+        ],
+        "type": "object",
+        "properties": {
+          "ballName": {
+            "type": "string"
+          },
+          "ballCounts": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "example": {
+          "ballName": "Blue",
+          "ballCounts": 1
+        }
+      },
+      "create-ball-request": {
+        "title": "create-ball-request",
+        "required": [
+          "ballColor",
+          "ballVolume"
+        ],
+        "type": "object",
+        "properties": {
+          "ballColor": {
+            "type": "string"
+          },
+          "ballVolume": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "example": {
+          "ballColor": "Pink",
+          "ballVolume": 20
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Basket"
+    },
+    {
+      "name": "Balls"
+    }
+  ]
+}
