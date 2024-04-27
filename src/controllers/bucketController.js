@@ -159,17 +159,27 @@ class BasketController{
     */
     getBucketData = async (req, res) => {
         try {
-            const buckets = await Bucket.find();    
+            const buckets = await Bucket.find();
+    
             // Transform the bucket data
             const transformedBuckets = buckets.map(bucket => {
-                const ballDataString = bucket.ballsData.map(ball => `${ball.ballCounts} ${ball.ballName} ball`).join(', ');
+                let bucketDataString;
+                if (bucket.ballsData.length === 0) {
+                    bucketDataString = "No balls";
+                } else {
+                    bucketDataString = bucket.ballsData.map(ball => `${ball.ballCounts} ${ball.ballName} ball`).join(', ');
+                }
                 return {
                     bucketName: bucket.bucketName,
-                    bucketData: ballDataString
+                    bucketData: bucketDataString
                 };
             });
     
-            return res.status(200).json({ message: messages.BUCKET_DATA, data: transformedBuckets });
+            // Check if all buckets have no data
+            const allEmpty = transformedBuckets.every(bucket => bucket.bucketData === "No balls");
+            const message = allEmpty ? "Buckets has no data" : "Buckets data";
+    
+            return res.status(200).json({ message: message, data: transformedBuckets });
         } catch (error) {
             console.error("Error fetching bucket data:", error);
             return res.status(500).json({ message: "Internal server error" });
