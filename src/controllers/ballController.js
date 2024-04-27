@@ -50,7 +50,14 @@ class BallController{
         }
     };
 
-
+    /**
+     *@param{}
+     *@return json response 
+    */
+     getBallData = async(req, res)=>{
+        const bucket = await Ball.find()
+        return res.status(200).send({ message: messages.BALL_DATA, data:bucket});
+    }
 
 }
 

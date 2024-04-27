@@ -162,16 +162,6 @@ class BasketController{
         return res.status(200).send({ message: "Buckets data : ", data:bucket});
     }
 
-    /**
-     *@param{}
-     *@return json response 
-    */
-    getBucketSuggesion = async(req, res)=>{
-        const bucket = await Bucket.find()
-        return res.status(200).send({ message: "Buckets data : ", data:bucket});
-    }
-
-
 }
 
 const basketController = new BasketController();

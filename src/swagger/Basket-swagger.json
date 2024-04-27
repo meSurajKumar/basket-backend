@@ -178,6 +178,23 @@
         },
         "deprecated": false
       }
+    },
+    "/ball": {
+      "get": {
+        "tags": [
+          "Balls"
+        ],
+        "summary": "get-ball-data",
+        "operationId": "get-ball-data",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "deprecated": false
+      }
     }
   },
   "components": {
