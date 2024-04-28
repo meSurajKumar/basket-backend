@@ -3,6 +3,9 @@ import Ball from "../models/Ball.js";
 import {messages} from '../common/apiResponses.js'
 import {emptyBucket} from '../common/commonFunctions.js'
 
+// middleware
+import asyncMiddleware from '../middlewares/async.js'
+
 
 class BasketController{
     constructor(){}
@@ -12,8 +15,7 @@ class BasketController{
      * @param {bucketName , volume}
      * @return json response
     */
-    createBucket = async (req, res) => {
-        try {
+    createBucket = asyncMiddleware(async (req, res) => {
             const { bucketName, volume } = req.body;    
             // Empty all existing buckets
             const buckets = await Bucket.find();
@@ -44,19 +46,14 @@ class BasketController{
                 message = messages.BUCKET_CREATED;
             }    
             return res.status(200).send({ message, data: bucket });
-        } catch (error) {
-            console.error("Error in createBucket method:", error);
-            return res.status(500).send({ message: "An error occurred while creating or updating the bucket." });
-        }
-    };
+    });
 
     /**
      * Add balls to bucket
      * @param {[{ballName, ballCounts},{ballName, ballCounts},{ballName, ballCounts}.....]}
      * @return jons response
     */
-    addBalls = async (req, res) => {
-        try {
+    addBalls = asyncMiddleware(async (req, res) => {
             let transformedBallData = [];
             const ballsData = req.body.ballData;
             const buckets = await Bucket.find();
@@ -145,22 +142,16 @@ class BasketController{
             } else {
                 // All balls stored successfully
                 return res.status(200).send({ message: messages.BALL_STORED });
-            }
-        } catch (error) {
-            console.error("Error in addBalls method:", error);
-            return res.status(500).send({ message: "An error occurred while placing balls in buckets." });
-        }
-    };
+            }        
+    });
     
 
     /**
      *@param{}
      *@return json response 
     */
-    getBucketData = async (req, res) => {
-        try {
-            const buckets = await Bucket.find();
-    
+    getBucketData = asyncMiddleware(async (req, res) => {
+        const buckets = await Bucket.find();    
             // Transform the bucket data
             const transformedBuckets = buckets.map(bucket => {
                 let bucketDataString;
@@ -180,11 +171,7 @@ class BasketController{
             const message = allEmpty ? "Buckets has no data" : "Buckets data";
     
             return res.status(200).json({ message: message, data: transformedBuckets });
-        } catch (error) {
-            console.error("Error fetching bucket data:", error);
-            return res.status(500).json({ message: "Internal server error" });
-        }
-    };
+    });
 
 }
 

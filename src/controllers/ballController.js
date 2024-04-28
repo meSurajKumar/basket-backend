@@ -3,7 +3,8 @@ import Bucket from "../models/Bucket.js";
 import {messages} from '../common/apiResponses.js'
 import {emptyBucket} from '../common/commonFunctions.js'
 
-
+// middleware
+import asyncMiddleware from '../middlewares/async.js'
 
 
 class BallController{
@@ -14,8 +15,7 @@ class BallController{
      * @param {ballColor , ballVolume}
      * @return json response
      */
-    createBall = async (req, res) => {
-        try {
+    createBall = asyncMiddleware(async (req, res) => {
             const { ballColor, ballVolume } = req.body;    
             // Empty all existing buckets
             const buckets = await Bucket.find();
@@ -44,20 +44,16 @@ class BallController{
                 message = messages.BALL_CREATED;
             }    
             return res.status(200).send({ message, data: ball });
-        } catch (error) {
-            console.error("Error in createBall method:", error);
-            return res.status(500).send({ message: "An error occurred while creating or updating the ball." });
-        }
-    };
+    });
 
     /**
      *@param{}
      *@return json response 
     */
-     getBallData = async(req, res)=>{
+     getBallData = asyncMiddleware(async(req, res)=>{
         const bucket = await Ball.find()
         return res.status(200).send({ message: messages.BALL_DATA, data:bucket});
-    }
+    });
 
 }
 
